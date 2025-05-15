@@ -3903,24 +3903,26 @@ BOOL CSequenceMain::Btm1Picker_Run()
 			m_tBtm1PickLoop.Takt_Start(nTaktZone, 45);
 			//Start Trigger with Setting Speed
 			dB1ScanpX = m_pMoveData->dBtm1PickerX[7];
-			if(m_pEquipData->bUsePMTrigger){
+			if(m_pEquipData->bUsePMTrigger)
+			{
 				g_objAJinAXL.SetEncoderActPos(AX_PM_TRIGGER, 0);
 				g_objAJinAXL.Start_Trigger(AX_PM_TRIGGER,  m_pEquipData->dTriggerStart, m_pEquipData->dTriggerEnd, 
 				m_pEquipData->dTriggerPeriod, (m_pEquipData->dTriggerPeriod/2) );
 			}
 			g_objAJinAXL.Move_Absolute_Vel(AX_BTM1_PICKER_X, dB1ScanpX, m_pEquipData->dTriggerVel);
 						
-			m_nBtm1PickCase = 42; 
+			m_nBtm1PickCase = 47; 
 			m_tBtm1PickLoop.Set_LoopTime(15000);
 		}
 		break;
 		
 	case 47:
 		
-		if ((g_objAJinAXL.Is_Done(AX_BTM1_PICKER_Z) && g_objAJinAXL.Is_Done(AX_BTM1_PICKER_X))
-			|| !m_pEquipData->bUseInspectBtm13D) {
+		if ((g_objAJinAXL.Is_Done(AX_BTM1_PICKER_Z) && g_objAJinAXL.Is_MoveDone(AX_BTM1_PICKER_X, dB1ScanpX)) || !m_pEquipData->bUseInspectBtm13D)
+		{
 
-			if(m_pEquipData->bUsePMTrigger){
+			if(m_pEquipData->bUsePMTrigger)
+			{
 				g_objAJinAXL.Stop_Trigger(AX_PM_TRIGGER);
 			}
 
