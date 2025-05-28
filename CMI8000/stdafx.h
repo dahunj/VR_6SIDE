@@ -72,7 +72,7 @@
 	#pragma comment(lib, "CSUdpClientR.lib")
 #endif
 
-#define MAIN_VERSION	_T("V 3.2.0.68")
+#define MAIN_VERSION	_T("V 3.2.0.72")
 
 //주석처리하면 SIMULATION 
 //#define AJIN_BOARD_USE 
