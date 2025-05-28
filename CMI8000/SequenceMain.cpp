@@ -595,7 +595,6 @@ BOOL CSequenceMain::LotEnd_Run()
 	if (gData.bCycleStop) g_dlgWork.PostMessage(UM_RESET_CYCLE_STOP, NULL, NULL);
 
 	gMes.nLotStatus = 0;
-	g_objMES.Set_Status(3);	//Idle Set
 	gData.bMesFirstLot = FALSE;
 	g_objMES.m_nMESSequence = 0;
 // 	g_objMES.m_bMesErr = FALSE;

@@ -528,7 +528,6 @@ void CWorkDlg::OnBnClickedBtnMesAbort()
 
 	g_objMES.Set_LotCancel(gData.sLotID[m_nPortIdx], gData.nCmUseCount[m_nPortIdx], gData.sOperID);
 // 	gData.bMesRegistered[m_nPortIdx] = FALSE;
-	g_objMES.Set_Status(3);	// Idle
 
 	CString strLog;
 	strLog.Format("Lot Cancel OK...  => Lot[%s] 취소를 MES에 전송하였습니다.", gData.sLotID[m_nPortIdx]);
