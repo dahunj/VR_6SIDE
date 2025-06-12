@@ -10181,21 +10181,20 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 	case 1:		// Tray È®ÀÎ.
 		if (m_bUnloadLotEnd) m_nEmptyTrayElCase = 0;
 
-#ifdef EDITION_2ND
-		else if (m_pDX01->iEmptyPortSlideClose) {
-#else
-		else if (m_pDX07->iEmptyPortSlideClose) {
-#endif
+		else if (m_pDX01->iEmptyPortSlideClose) 
+		{
+
 			gData.bEmptyZTopCheckRepeat = FALSE;
 			gData.bEmptyFull = FALSE;
 			if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 0)) m_nEmptyTrayElCase = 20;
 			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 1)) m_nEmptyTrayElCase = 21;
 
-#ifdef EDITION_2ND
-			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.0) && !m_pDX01->iEmptyPortTopCheck && !m_pDX01->iEmptyPortExist) m_nEmptyTrayElCase++;
-#else
-			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.0) && !m_pDX07->iEmptyPortTopCheck && !m_pDX07->iEmptyPortExist) m_nEmptyTrayElCase++;
-#endif
+			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.5) && !m_pDX01->iEmptyPortTopCheck && !m_pDX01->iEmptyPortExist) m_nEmptyTrayElCase++;
+			else
+			{ 
+				g_objCommon.Move_Position(AX_EMPTY_PORT_Z, 0);
+				m_nEmptyTrayElCase = 20;
+			}
 			m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		}
 		break;
