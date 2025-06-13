@@ -73,7 +73,7 @@ CSequenceMain::CSequenceMain()
 	iGoodTrayBufferCount = 0;
 	Reset_MainRunCase();
 
-	gData.dEmptyPort_Z_Limit = m_pMoveData->dEmptyPortZ[2];
+	gData.dEmptyPort_Z_Limit = 300;
 }
 
 CSequenceMain::~CSequenceMain()
@@ -10219,10 +10219,11 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 			g_objAJinAXL.Stop_Motion(AX_EMPTY_PORT_Z);
 			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		} 
-		else if(dEmpty_Z > gData.dEmptyPort_Z_Limit) // if over limit ---> ready down 
+		else if(dEmpty_Z > gData.dEmptyPort_Z_Limit && g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z)) // if over limit ---> ready down 
 		{
 			g_objAJinAXL.Stop_Motion(AX_EMPTY_PORT_Z);
-			m_nEmptyTrayElCase = 5; m_tEmptyTrayElLoop.Set_LoopTime(5000);
+			g_objCommon.Move_Position(AX_EMPTY_PORT_Z, 0);
+			m_nEmptyTrayElCase = 20; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		}
 		else if (!m_pDX01->iEmptyPortTopCheck && g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.0))
 		{
