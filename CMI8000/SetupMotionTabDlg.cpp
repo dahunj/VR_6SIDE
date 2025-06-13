@@ -251,6 +251,8 @@ void CSetupMotionTabDlg::OnBtnHomeClick(UINT nID)
 	int ID = nID - IDC_BTN_HOME_0;
 	int nStartAx = m_nMotionTab * 8;
 
+	if (Check_Interlock(nStartAx + ID) == FALSE) return;
+
 	g_objAJinAXL.Home_Search(nStartAx + ID);
 
 	m_strLog.Format("[Setup Motion] Homing - %s", g_objAJinAXL.Get_AxisName(nStartAx + ID));
@@ -326,6 +328,8 @@ void CSetupMotionTabDlg::OnBtnAbsMoveClick(UINT nID)
 	CString strText;
 	m_stcAbsDist[ID].GetWindowText(strText);
 	double dDist = atof(strText);
+
+	if (Check_Interlock(nStartAx + ID) == FALSE) return;
 
 	g_objAJinAXL.Move_Absolute(nStartAx + ID, dDist);
 
@@ -511,3 +515,216 @@ void CSetupMotionTabDlg::Cancel_MotionData(int nTab)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+BOOL CSetupMotionTabDlg::Check_Interlock(int nAxis)
+{
+	DX_DATA_01 *pDX01 = g_objAJinAXL.Get_pDX01();
+	DX_DATA_09 *pDX09 = g_objAJinAXL.Get_pDX09();
+	DX_DATA_13 *pDX13 = g_objAJinAXL.Get_pDX13();
+
+	if (nAxis == AX_LOAD_PICKER_Y) 
+	{
+		if(!pDX01->iLoadPickerUp || pDX01->iLoadPickerDown)
+		{
+			AfxMessageBox(_T("Load Picker Sylinder Z Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_ANGLE_STAGE1_Y)
+	{
+		double curPosZ1 = g_objAJinAXL.Get_pStatus(AX_ANGLE_STAGE1_Z)->dPos;
+		double curPosZ2 = g_objAJinAXL.Get_pStatus(AX_ANGLE_STAGE2_Z)->dPos;
+
+		if(fabs(curPosZ1 - curPosZ2) < 80) 
+		{
+			AfxMessageBox(_T("Angle Stage 간 충돌 위험 있습니다."));
+			return FALSE;
+		}
+
+		if(!g_objCommon.Check_Position(AX_BTM1_PICKER_Z, 0))
+		{
+			AfxMessageBox(_T("Btm1 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_ANGLE_STAGE2_Y)
+	{
+		double curPosZ1 = g_objAJinAXL.Get_pStatus(AX_ANGLE_STAGE1_Z)->dPos;
+		double curPosZ2 = g_objAJinAXL.Get_pStatus(AX_ANGLE_STAGE2_Z)->dPos;
+
+		if(fabs(curPosZ1 - curPosZ2) < 80) 
+		{
+			AfxMessageBox(_T("Angle Stage 간 충돌 위험 있습니다."));
+			return FALSE;
+		}
+
+
+		if(!g_objCommon.Check_Position(AX_BTM1_PICKER_Z, 0))
+		{
+			AfxMessageBox(_T("Btm1 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+
+	if(nAxis == AX_BTM1_PICKER_X)
+	{
+		if(!g_objCommon.Check_Position(AX_BTM1_PICKER_Z, 0))
+		{
+			AfxMessageBox(_T("Btm1 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+
+	}
+
+	if(nAxis == AX_BUFFER_STAGE1_Y)
+	{
+		if( (pDX09->iBufferStage1Down && pDX09->iBufferStage2Down )
+			||(pDX09->iBufferStage1Up && pDX09->iBufferStage2Up)
+			||(!pDX09->iBufferStage1Down && !pDX09->iBufferStage2Down)
+			||(!pDX09->iBufferStage1Up && !pDX09->iBufferStage2Up))
+		{
+			AfxMessageBox(_T("Buffer Stage 충돌 위험 있습니다."));
+			return FALSE;
+		}
+
+		if(!g_objCommon.Check_Position(AX_BTM2_PICKER_Z, 0))
+		{
+			AfxMessageBox(_T("Btm2 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_BUFFER_STAGE2_Y)
+	{
+		if( (pDX09->iBufferStage1Down && pDX09->iBufferStage2Down )
+			||(pDX09->iBufferStage1Up && pDX09->iBufferStage2Up)
+			||(!pDX09->iBufferStage1Down && !pDX09->iBufferStage2Down)
+			||(!pDX09->iBufferStage1Up && !pDX09->iBufferStage2Up))
+		{
+			AfxMessageBox(_T("Buffer Stage 충돌 위험 있습니다."));
+			return FALSE;
+		}
+
+		if(!g_objCommon.Check_Position(AX_BTM2_PICKER_Z, 0))
+		{
+			AfxMessageBox(_T("Btm2 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+
+	if(nAxis == AX_BTM2_PICKER_X)
+	{
+		if(!g_objCommon.Check_Position(AX_BTM2_PICKER_Z, 0))
+		{
+			AfxMessageBox(_T("Btm2 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_SORT_PICKER1_X)
+	{
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER1_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 1 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_SORT_PICKER2_X)
+	{
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER2_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 2 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_NG_STAGE_Y)
+	{
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER1_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 1 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER2_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 2 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_GOOD_STAGE1_Y)
+	{
+		double curPosZ1 = g_objAJinAXL.Get_pStatus(AX_GOOD_STAGE1_Z)->dPos;
+		double curPosZ2 = g_objAJinAXL.Get_pStatus(AX_GOOD_STAGE2_Z)->dPos;
+
+		if(fabs(curPosZ1 - curPosZ2) < 80) 
+		{
+			AfxMessageBox(_T("Good Stage 간 충돌 위험 있습니다."));
+			return FALSE;
+		}
+
+
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER1_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 1 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER2_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 2 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_GOOD_STAGE2_Y)
+	{
+		double curPosZ1 = g_objAJinAXL.Get_pStatus(AX_GOOD_STAGE1_Z)->dPos;
+		double curPosZ2 = g_objAJinAXL.Get_pStatus(AX_GOOD_STAGE2_Z)->dPos;
+
+		if(fabs(curPosZ1 - curPosZ2) < 80) 
+		{
+			AfxMessageBox(_T("Good Stage 간 충돌 위험 있습니다."));
+			return FALSE;
+		}
+
+
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER1_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 1 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+
+		if(!g_objCommon.Check_Position(AX_SORT_PICKER2_Z, 0))
+		{
+			AfxMessageBox(_T("Sort 2 Picker Z Ready Up 후에 진행하세요."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_EMPTY_TRANS1_X)
+	{
+		if(pDX13->iEmptyTrans1Down)
+		{
+			AfxMessageBox(_T("Empty Trans 1 Sylinder Down 입니다."));
+			return FALSE;
+		}
+	}
+
+	if(nAxis == AX_EMPTY_TRANS2_Y)
+	{
+		if(pDX13->iEmptyTrans2Down)
+		{
+			AfxMessageBox(_T("Empty Trans 2 Sylinder Down 입니다."));
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}

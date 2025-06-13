@@ -54,6 +54,9 @@
 #include "CSGrid.h"
 #include "CSUdpClient.h"
 #include <afxsock.h>
+
+#include <math.h>
+
 #ifdef _DEBUG
 	#pragma comment(lib, "CSControlsD.lib")
 	#pragma comment(lib, "CSIniFileD.lib")
