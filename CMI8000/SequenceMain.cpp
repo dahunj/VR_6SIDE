@@ -10050,14 +10050,15 @@ BOOL CSequenceMain::EmptyTrayX_Run()
 	case 10:	// Wait
 		if (m_nEmptyTrayYCase == 0 || m_nEmptyTrayYCase == 2 || m_nEmptyTrayYCase >= 20) {
 			// EmptyPort에 Tray가 있고 Good Stage에 Tray가 없으면 먼저 작업할수있게 기다려 준다.
-#ifdef EDITION_2ND
+
 			if (m_pDX01->iEmptyPortExist && m_pDX01->iEmptyPortTopCheck && (!m_pDX12->iGoodTrayBufferBottom || !m_pDX12->iGoodStage1Exist || !m_pDX12->iGoodStage2Exist))
-#else
-			if (m_pDX07->iEmptyPortExist && m_pDX07->iEmptyPortTopCheck && (!m_pDX12->iGoodTrayBufferBottom || !m_pDX12->iGoodStage1Exist || !m_pDX12->iGoodStage2Exist))
-#endif
+
 			{
 				return TRUE;
-			} else {
+			} 
+			else 
+			{
+				m_strLog.Format("Empty Picker X, 10");g_objLogFile.Save_MCCLog(m_strLog);
 				m_nEmptyTrayXCase++; m_tEmptyTrayXLoop.Set_LoopTime(5000);
 			}
 		}
@@ -10082,22 +10083,31 @@ BOOL CSequenceMain::EmptyTrayX_Run()
 			gData.dEmptyPortZDownOffset = dCurPos;
 			double dReadyPos = m_pMoveData->dEmptyPortZ[1];
 			if (dReadyPos < dCurPos) {
+				m_strLog.Format("Empty Picker X, 13-1");g_objLogFile.Save_MCCLog(m_strLog);
 				g_objAJinAXL.Move_Absolute(AX_EMPTY_PORT_Z, gData.dEmptyPortZDownOffset, 0.5);	// Down Offset Move
 				m_nEmptyTrayXCase++; m_tEmptyTrayXLoop.Set_LoopTime(10000);
-			} else {
+			} 
+			else 
+			{
+				m_strLog.Format("Empty Picker X, 13-2");g_objLogFile.Save_MCCLog(m_strLog);
 				m_nEmptyTrayElCase = 30;	// Full Alarm 처리
 				m_tEmptyTrayXLoop.Set_LoopTime(10000);
 			}
 		}
 		break;
 	case 14:	// Empty Tray Down
-		if (g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZDownOffset) && g_objCommon.Check_Position(AX_EMPTY_TRANS1_X, 1)) {
+		if (g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZDownOffset) && g_objCommon.Check_Position(AX_EMPTY_TRANS1_X, 1)) 
+		{
+			m_strLog.Format("Empty Picker X, 14-1");g_objLogFile.Save_MCCLog(m_strLog);
 			m_tEmptyTrayXLoop.Takt_Start(nTaktZone, 6);
 			gData.dEmptyPortZDownOffset = 0.0;
 			g_objCommon.Set_EmptyTrayXDown();
 			m_nEmptyTrayXCase++; m_tEmptyTrayXLoop.Set_LoopTime(5000);
-		} else if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZDownOffset)) {
+		}
+		else if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZDownOffset)) 
+		{
 			if (!m_tEmptyTrayXLoop.Waiting_Time(100)) break;
+			m_strLog.Format("Empty Picker X, 14-2");g_objLogFile.Save_MCCLog(m_strLog);
 			g_objAJinAXL.Move_Absolute(AX_EMPTY_PORT_Z, gData.dEmptyPortZDownOffset, 0.5);	// Down Offset Move
 		}
 		break;
@@ -10129,13 +10139,20 @@ BOOL CSequenceMain::EmptyTrayX_Run()
 		if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && g_objCommon.Get_EmptyTrayXUp() && !m_pDX13->iEmptyTrans1Exist) {
 			if (m_nEmptyTrayElCase == 10) {
 				m_tEmptyTrayXLoop.Takt_End(nTaktZone, 8,0);
-#ifdef EDITION_2ND
-				if (m_pDX01->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-				else								m_nEmptyTrayElCase = 2;	// Slow Up
-#else
-				if (m_pDX07->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-				else								m_nEmptyTrayElCase = 2;	// Slow Up
-#endif
+
+				m_strLog.Format("Empty Picker X, 18");g_objLogFile.Save_MCCLog(m_strLog);
+
+				if (m_pDX01->iEmptyPortTopCheck)
+				{
+					m_strLog.Format("Empty Picker X, 18-1");g_objLogFile.Save_MCCLog(m_strLog);
+					m_nEmptyTrayElCase = 5;	// Slow Down
+				}
+				else
+				{
+					m_strLog.Format("Empty Picker X, 18-2");g_objLogFile.Save_MCCLog(m_strLog);
+					m_nEmptyTrayElCase = 2;	// Slow Up
+				}
+
 				m_nEmptyTrayXCase = 20; m_tEmptyTrayXLoop.Set_LoopTime(5000);
 			}			
 		}
@@ -10186,12 +10203,24 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 
 			gData.bEmptyZTopCheckRepeat = FALSE;
 			gData.bEmptyFull = FALSE;
-			if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 0)) m_nEmptyTrayElCase = 20;
-			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 1)) m_nEmptyTrayElCase = 21;
-
-			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.5) && !m_pDX01->iEmptyPortTopCheck && !m_pDX01->iEmptyPortExist) m_nEmptyTrayElCase++;
-			else
+			if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 0))
+			{
+				m_strLog.Format("Empty Port Z, 1-1");g_objLogFile.Save_MCCLog(m_strLog);
+				m_nEmptyTrayElCase = 20;
+			}
+			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 1))
+			{
+				m_strLog.Format("Empty Port Z, 1-2");g_objLogFile.Save_MCCLog(m_strLog);
+				m_nEmptyTrayElCase = 21;
+			}
+			else if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.5) && !m_pDX01->iEmptyPortTopCheck && !m_pDX01->iEmptyPortExist)
+			{
+				m_strLog.Format("Empty Port Z, 1-3");g_objLogFile.Save_MCCLog(m_strLog);
+				m_nEmptyTrayElCase++;
+			}
+			else 
 			{ 
+				m_strLog.Format("Empty Port Z, 1-4");g_objLogFile.Save_MCCLog(m_strLog);
 				g_objCommon.Move_Position(AX_EMPTY_PORT_Z, 0);
 				m_nEmptyTrayElCase = 20;
 			}
@@ -10201,32 +10230,48 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 
 	// 1. Slow Up
 	case 2:		// Elevator Z Slow Up
-#ifdef EDITION_2ND
-		if (!m_pDX01->iEmptyPortTopCheck) {
-#else
-		if (!m_pDX07->iEmptyPortTopCheck) {
-#endif
+
+		if (!m_pDX01->iEmptyPortTopCheck) 
+		{
+			m_strLog.Format("Empty Port Z, 2-1");g_objLogFile.Save_MCCLog(m_strLog);
+
 			if (m_dwEmptyTrayEl == 0) m_dwEmptyTrayEl = GetTickCount();
 			m_tEmptyTrayElLoop.Takt_Start(nTaktZone, 1, TRUE);
 			g_objAJinAXL.Move_Relative(AX_EMPTY_PORT_Z, 2.0, 0.25);	// 2mm씩 올려준다.
 			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(20000);	// 20초
 		} 
+		else if(dEmpty_Z > gData.dEmptyPort_Z_Limit && g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z)) // if over limit ---> ready down 
+		{
+			m_strLog.Format("Empty Port Z, 2-2");g_objLogFile.Save_MCCLog(m_strLog);
+			//g_objAJinAXL.Stop_Motion(AX_EMPTY_PORT_Z);
+			g_objCommon.Move_Position(AX_EMPTY_PORT_Z, 0);
+			m_nEmptyTrayElCase = 20; m_tEmptyTrayElLoop.Set_LoopTime(5000);
+		}
+		else if (m_pDX01->iEmptyPortTopCheck || g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.5)) 
+		{
+			m_strLog.Format("Empty Port Z, 2-3");g_objLogFile.Save_MCCLog(m_strLog);
+			g_objAJinAXL.Stop_Motion(AX_EMPTY_PORT_Z);
+			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(5000);
+		}
 		break;
 	case 3:		// Buffer Z Up Stop
 		dEmpty_Z = g_objAJinAXL.Get_Position(AX_EMPTY_PORT_Z);
 		if (m_pDX01->iEmptyPortTopCheck || g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.5))
 		{
+			m_strLog.Format("Empty Port Z, 3-1");g_objLogFile.Save_MCCLog(m_strLog);
 			g_objAJinAXL.Stop_Motion(AX_EMPTY_PORT_Z);
 			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		} 
 		else if(dEmpty_Z > gData.dEmptyPort_Z_Limit && g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z)) // if over limit ---> ready down 
 		{
+			m_strLog.Format("Empty Port Z, 3-2");g_objLogFile.Save_MCCLog(m_strLog);
 			g_objAJinAXL.Stop_Motion(AX_EMPTY_PORT_Z);
 			g_objCommon.Move_Position(AX_EMPTY_PORT_Z, 0);
 			m_nEmptyTrayElCase = 20; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		}
 		else if (!m_pDX01->iEmptyPortTopCheck && g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 2, 1.0))
 		{
+			m_strLog.Format("Empty Port Z, 3-3");g_objLogFile.Save_MCCLog(m_strLog);
 			m_nEmptyTrayElCase = 2; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -10247,46 +10292,44 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 
 	// 2. Slow Down
 	case 5:		// Buffer Z Slow Down
-#ifdef EDITION_2ND
-		if (m_pDX01->iEmptyPortTopCheck) {
-#else
-		if (m_pDX07->iEmptyPortTopCheck) {
-#endif
+		if (m_pDX01->iEmptyPortTopCheck) 
+		{
+			m_strLog.Format("Empty Port Z, 5-1");g_objLogFile.Save_MCCLog(m_strLog);
+				
 			if (m_dwEmptyTrayEl == 0) m_dwEmptyTrayEl = GetTickCount();
 			m_tEmptyTrayElLoop.Takt_Start(nTaktZone, 2);
 			g_objAJinAXL.Move_Absolute(AX_EMPTY_PORT_Z, m_pMoveData->dEmptyPortZ[1], 0.25);	//Ready Position
 			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(10000);	// 10초
-		} else {
+		} 
+		else 
+		{
+			m_strLog.Format("Empty Port Z, 5-2");g_objLogFile.Save_MCCLog(m_strLog);
 			gData.bEmptyZTopCheckRepeat = FALSE;
 			m_nEmptyTrayElCase = 10; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		}
 		break;
 	case 6:		// Buffer Z Down Stop
-#ifdef EDITION_2ND
-		if (!m_pDX01->iEmptyPortTopCheck) {
-#else
-		if (!m_pDX07->iEmptyPortTopCheck) {
-#endif
+
+		if (!m_pDX01->iEmptyPortTopCheck) 
+		{
 			g_objAJinAXL.Stop_Motion(AX_EMPTY_PORT_Z);
 			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		}
 		break;
 	case 7:		// Check Buffer Z Done
-#ifdef EDITION_2ND
-		if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !m_pDX01->iEmptyPortTopCheck) {
-#else
-		if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !m_pDX07->iEmptyPortTopCheck) {
-#endif
+
+		if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !m_pDX01->iEmptyPortTopCheck) 
+		{
+
 			if (!m_tEmptyTrayElLoop.Waiting_Time(300)) break;	// 센서가 정말로 꺼졌나 확인하는 시간.
 
 			m_tEmptyTrayElLoop.Takt_End(nTaktZone, 2,0);
 			m_nEmptyTrayElCase = 2; m_tEmptyTrayElLoop.Set_LoopTime(5000);
+			m_strLog.Format("Empty Port Z, 7-1");g_objLogFile.Save_MCCLog(m_strLog);
 		} 
-#ifdef EDITION_2ND
-		else if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && m_pDX01->iEmptyPortTopCheck) {
-#else
-		else if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && m_pDX07->iEmptyPortTopCheck) {
-#endif
+		else if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && m_pDX01->iEmptyPortTopCheck) 
+		{
+			m_strLog.Format("Empty Port Z, 7-2");g_objLogFile.Save_MCCLog(m_strLog);
 			m_nEmptyTrayElCase = 5; m_tEmptyTrayElLoop.Set_LoopTime(5000);
 		}
 		break;
@@ -10295,31 +10338,32 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 		return TRUE;
 
 	case 20:	// Move to Ready Position
-		if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 0)) {
+		if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 0)) 
+		{
+			m_strLog.Format("Empty Port Z, 20");g_objLogFile.Save_MCCLog(m_strLog);			
 			g_objCommon.Move_Position(AX_EMPTY_PORT_Z, 1);
 			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(10000);
 		}
 		break;
 	case 21:	// Position Check
-		if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 1)) {
+		if (g_objCommon.Check_Position(AX_EMPTY_PORT_Z, 1)) 
+		{
+			m_strLog.Format("Empty Port Z, 21");g_objLogFile.Save_MCCLog(m_strLog);
 			m_dwEmptyTrayEl = GetTickCount();
 			m_nEmptyTrayElCase++; m_tEmptyTrayElLoop.Set_LoopTime(10000);
 		}
 		break;
 	case 22:	// 트레이가 있어야하고 탑체크 감지 안되어 있어야한다.
-#ifdef EDITION_2ND
-		if (!m_pDX01->iEmptyPortTopCheck && m_pDX01->iEmptyPortSlideClose) {
+	if (!m_pDX01->iEmptyPortTopCheck && m_pDX01->iEmptyPortSlideClose) 
+		{
+			m_strLog.Format("Empty Port Z, 22-1");g_objLogFile.Save_MCCLog(m_strLog);
 			m_nEmptyTrayElCase = 2; m_tEmptyTrayElLoop.Set_LoopTime(20000);	// 20초
-		} else if (m_pDX01->iEmptyPortTopCheck) {
+		} 
+		else if (m_pDX01->iEmptyPortTopCheck) 
+		{
+			m_strLog.Format("Empty Port Z, 22-2");g_objLogFile.Save_MCCLog(m_strLog);
 			m_nEmptyTrayElCase = 25; m_tEmptyTrayElLoop.Set_LoopTime(10000);
 		}
-#else
-		if (!m_pDX07->iEmptyPortTopCheck && m_pDX07->iEmptyPortSlideClose) {
-			m_nEmptyTrayElCase = 2; m_tEmptyTrayElLoop.Set_LoopTime(20000);	// 20초
-		} else if (m_pDX07->iEmptyPortTopCheck) {
-			m_nEmptyTrayElCase = 25; m_tEmptyTrayElLoop.Set_LoopTime(10000);
-		}
-#endif
 		break;
 
 	case 25:	// Move to Base Position
@@ -10351,6 +10395,7 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 			m_tEmptyTrayElLoop.Takt_End(nTaktZone, 3, TRUE);
 			m_nEmptyTrayElCase = 0; 
 			gData.bEmptyFull = TRUE;
+			gData.dEmptyPort_Z_Limit = m_pMoveData->dEmptyPortZ[2];
 			g_objCommon.Show_Error(4932);	// Empty Tray Full Alarm
 			return FALSE;
 		}
@@ -10438,32 +10483,41 @@ BOOL CSequenceMain::EmptyTrayY_Run()
 		break;
 	case 5:		// Angle Port 확인 (30sec)
 		// Offset Up 하기전에 다시 Port 확인 해준다.
-		if (m_nEmptyTrayElCase == 10) {
+		if (m_nEmptyTrayElCase == 10)
+		{
 			if (!m_tEmptyTrayYLoop.Waiting_Time(100)) break;
-#ifdef EDITION_2ND
-			if (m_pDX01->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-			else								m_nEmptyTrayElCase = 2;	// Slow Up
-#else
-			if (m_pDX07->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-			else								m_nEmptyTrayElCase = 2;	// Slow Up
-#endif
+
+			if (m_pDX01->iEmptyPortTopCheck)
+			{
+				m_strLog.Format("Empty Picker Y, 5-1");g_objLogFile.Save_MCCLog(m_strLog);
+				m_nEmptyTrayElCase = 5;	// Slow Down
+			}
+			else
+			{
+				m_strLog.Format("Empty Picker Y, 5-2");g_objLogFile.Save_MCCLog(m_strLog);
+				m_nEmptyTrayElCase = 2;	// Slow Up
+			}
+
 			m_nEmptyTrayYCase++; m_tEmptyTrayYLoop.Set_LoopTime(30000);
 		}
 		break;
 	case 6:		// Offset Up
 		if (m_nEmptyTrayElCase == 10) {
-#ifdef EDITION_2ND
-			if (m_pDX01->iEmptyPortTopCheck) {		// 23.06.25 테스트, AHN
-#else
-			if (m_pDX07->iEmptyPortTopCheck) {
-#endif
-				double dCurPos = g_objAJinAXL.Get_Position(AX_EMPTY_PORT_Z);
-				double dLimitPos = m_pMoveData->dEmptyPortZ[2] + m_pMoveData->dEmptyTrans2Y[2];	// LimitUp + Up Offset 보다 위로 올라가지 못하게 해준다.
 
-				if (dCurPos > m_pMoveData->dEmptyPortZ[2] + 0.5) {
+			if (m_pDX01->iEmptyPortTopCheck) 
+			{		// 23.06.25 테스트, AHN
+				double dCurPos = g_objAJinAXL.Get_Position(AX_EMPTY_PORT_Z);
+				double dLimitPos = m_pMoveData->dEmptyPortZ[2] + m_pMoveData->dEmptyTrans2Y[2];	// Limit Up + Up Offset 보다 위로 올라가지 못하게 해준다.
+
+				if (dCurPos > m_pMoveData->dEmptyPortZ[2] + 0.5) 
+				{
+					m_strLog.Format("Empty Picker Y, 6-1");g_objLogFile.Save_MCCLog(m_strLog);
 					g_objCommon.Move_Position(AX_EMPTY_PORT_Z, 0);
 					m_nEmptyTrayYCase++; m_tEmptyTrayYLoop.Set_LoopTime(10000);
-				} else {
+				} 
+				else 
+				{
+					m_strLog.Format("Empty Picker Y, 6-2");g_objLogFile.Save_MCCLog(m_strLog);
 					gData.dEmptyPortZUpOffset = dCurPos + m_pMoveData->dEmptyTrans2Y[2];	// 현재 위치 + Up Offset
 					if (gData.dEmptyPortZUpOffset > dLimitPos) gData.dEmptyPortZUpOffset = dLimitPos;
 					g_objAJinAXL.Move_Absolute(AX_EMPTY_PORT_Z, gData.dEmptyPortZUpOffset, 0.5);	// Offset Move
@@ -10480,24 +10534,35 @@ BOOL CSequenceMain::EmptyTrayY_Run()
 		break;
 
 	case 10:	// Empty Tray Down
-		if (g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZUpOffset) && g_objCommon.Check_Position(AX_EMPTY_TRANS2_Y, 1)) {
+	if (g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZUpOffset) && g_objCommon.Check_Position(AX_EMPTY_TRANS2_Y, 1)) 
+		{
 			m_tEmptyTrayYLoop.Takt_Start(nTaktZone, 2);
-
+			m_strLog.Format("Empty Picker Y, 10-1-1");g_objLogFile.Save_MCCLog(m_strLog);
 			gData.dEmptyPortZUpOffset = 0.0;
 			g_objCommon.Set_EmptyTrayYDown();
 			m_nEmptyTrayYCase++; m_tEmptyTrayYLoop.Set_LoopTime(5000);
 
-		} else if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZUpOffset)) {
+		}
+		else if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && !g_objAJinAXL.Is_MoveDone(AX_EMPTY_PORT_Z, gData.dEmptyPortZUpOffset)) 
+		{
 			if (!m_tEmptyTrayYLoop.Waiting_Time(100)) break;
 			// 매뉴얼로 조치했을수 있기 때문에 무조건 옵셋으로 보내주지 않고 Z축 Slow Up/Down을 다시 해준다.
 			// case는 6번으로 보내줘 옵셋을 다시 설정해준다.
-#ifdef EDITION_2ND
-			if (m_pDX01->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-			else								m_nEmptyTrayElCase = 2;	// Slow Up
-#else
-			if (m_pDX07->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-			else								m_nEmptyTrayElCase = 2;	// Slow Up
-#endif
+
+			if (m_nEmptyTrayElCase == 10)
+			{
+				if (m_pDX01->iEmptyPortTopCheck)
+				{
+					m_strLog.Format("Empty Picker Y, 10-2-1");g_objLogFile.Save_MCCLog(m_strLog);
+					m_nEmptyTrayElCase = 5;	// Slow Down
+				}
+				else
+				{
+					m_strLog.Format("Empty Picker Y, 10-2-2");g_objLogFile.Save_MCCLog(m_strLog);
+					m_nEmptyTrayElCase = 2;	// Slow Up
+				}
+
+			}			
 			m_nEmptyTrayYCase = 6; m_tEmptyTrayYLoop.Set_LoopTime(30000);
 		}
 		break;
@@ -10527,15 +10592,20 @@ BOOL CSequenceMain::EmptyTrayY_Run()
 		break;
 	case 14:	// Angle Port 진행.
 		if (g_objAJinAXL.Is_Done(AX_EMPTY_PORT_Z) && g_objCommon.Get_EmptyTrayYUp() && m_pDX13->iEmptyTrans2Exist) {
-			if (m_nEmptyTrayElCase == 10) {
+			if (m_nEmptyTrayElCase == 10) 
+			{
 				m_tEmptyTrayYLoop.Takt_End(nTaktZone, 4,0);
-#ifdef EDITION_2ND
-				if (m_pDX01->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-				else								m_nEmptyTrayElCase = 2;	// Slow Up
-#else
-				if (m_pDX07->iEmptyPortTopCheck)	m_nEmptyTrayElCase = 5;	// Slow Down
-				else								m_nEmptyTrayElCase = 2;	// Slow Up
-#endif
+
+				if (m_pDX01->iEmptyPortTopCheck)
+				{
+					m_strLog.Format("Empty Picker Y, 14-1");g_objLogFile.Save_MCCLog(m_strLog);
+					m_nEmptyTrayElCase = 5;	// Slow Down
+				}
+				else
+				{
+					m_strLog.Format("Empty Picker Y, 14-2");g_objLogFile.Save_MCCLog(m_strLog);
+					m_nEmptyTrayElCase = 2;	// Slow Up
+				}
 				m_nEmptyTrayYCase++; m_tEmptyTrayYLoop.Set_LoopTime(5000);
 			}			
 		}
