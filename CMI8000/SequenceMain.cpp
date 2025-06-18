@@ -10258,6 +10258,7 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 
 	// 1. Slow Up
 	case 2:		// Elevator Z Slow Up
+		dEmpty_Z = g_objAJinAXL.Get_Position(AX_EMPTY_PORT_Z);
 		if (!m_pDX01->iEmptyPortTopCheck) 
 		{
 			m_strLog.Format("Empty Port Z, 2-1");g_objLogFile.Save_MCCLog(m_strLog);
@@ -10408,6 +10409,7 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 			m_tEmptyTrayElLoop.Takt_End(nTaktZone, 3, TRUE);
 			m_nEmptyTrayElCase = 0;
 			gData.bEmptyFull = TRUE;
+			gData.dEmptyPort_Z_Limit = m_pMoveData->dEmptyPortZ[2];
 			g_objCommon.Show_Error(4926);	// Empty Tray Full Alarm
 			return FALSE;
 		}
