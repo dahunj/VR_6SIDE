@@ -682,7 +682,7 @@ BOOL CWorkDlg::Work_Start()
 	g_objInspector.Set_FOBRequest(INSPECTOR_ALL);	// 시작전 FOB 모드 확인
 
 #ifndef DRY_RUN_TEST
-	if (!pEquipData->bUseInspectAngle || !pEquipData->bUseInspectBtm1Specular || !pEquipData->bUseInspectBtm1Angle || !pEquipData->bUseInspectBtm13D
+	if (!pEquipData->bUseInspectBtm1Specular || !pEquipData->bUseInspectBtm1Angle || !pEquipData->bUseInspectBtm13D
 		|| !pEquipData->bUseInspectTop1 || !pEquipData->bUseInspectTop2 || !pEquipData->bUseInspectBtm2) {
 
 		if (!pEquipData->bResultTestUse) {
