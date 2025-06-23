@@ -10410,7 +10410,8 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 			m_nEmptyTrayElCase = 0;
 			gData.bEmptyFull = TRUE;
 			gData.dEmptyPort_Z_Limit = m_pMoveData->dEmptyPortZ[2];
-			g_objCommon.Show_Error(4926);	// Empty Tray Full Alarm
+			//g_objCommon.Show_Error(4926);	// Empty Tray Full Alarm
+			g_dlgWork.PostMessage(UM_SHOW_MSG, 4, NULL);
 			return FALSE;
 		}
 		break;
@@ -10430,7 +10431,8 @@ BOOL CSequenceMain::EmptyTrayElevator_Run()
 			m_nEmptyTrayElCase = 0; 
 			gData.bEmptyFull = TRUE;
 			gData.dEmptyPort_Z_Limit = m_pMoveData->dEmptyPortZ[2];
-			g_objCommon.Show_Error(4932);	// Empty Tray Full Alarm
+			g_dlgWork.PostMessage(UM_SHOW_MSG, 4, NULL);
+			//g_objCommon.Show_Error(4932);	// Empty Tray Full Alarm
 			return FALSE;
 		}
 		break;
@@ -10535,7 +10537,7 @@ BOOL CSequenceMain::EmptyTrayY_Run()
 				m_nEmptyTrayElCase = 2;	// Slow Up
 			}
 
-			m_nEmptyTrayYCase++; m_tEmptyTrayYLoop.Set_LoopTime(30000);
+			m_nEmptyTrayYCase++; m_tEmptyTrayYLoop.Set_LoopTime(60000);
 		}
 		break;
 	case 6:		// Offset Up

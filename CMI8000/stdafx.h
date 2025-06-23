@@ -78,14 +78,14 @@
 #define MAIN_VERSION	_T("V 3.2.0.76")
 
 //주석처리하면 SIMULATION 
-#define AJIN_BOARD_USE 
-#define LOT_BARCODE_USE
+//#define AJIN_BOARD_USE 
+//#define LOT_BARCODE_USE
 
 // 2~5호기 옵션
 #define EDITION_2ND 		// 2~5호기
 
 // 테스트 런 옵션
-#define DRY_RUN_TEST		// Dry Run Test 시 사용
+//#define DRY_RUN_TEST		// Dry Run Test 시 사용
 
 // EVMS 사용 옵션 (2024.01.26)
 // #define USE_AVI_EVMS		// EVMS 폴더 사용

@@ -1579,10 +1579,18 @@ LRESULT CWorkDlg::OnModelChange(WPARAM wParam, LPARAM lParam)
 LRESULT CWorkDlg::OnShowMsg(WPARAM wParam, LPARAM lParam)
 {
 	//g_dlgWork.PostMessage(UM_LOT_END_MSG, NULL, NULL);
-	if		(wParam == 1) g_objCommon.Show_MsgBox(1, "NG Tray Full 상태입니다.\nNG Tray 교체 해주십시오.");
-	else if	(wParam == 2) g_objCommon.Show_MsgBox(1, "현재 Lot이 종료 되었습니다. NG Tray 교체 해주십시오.");
-	else if	(wParam == 3) g_objCommon.Show_MsgBox(1, "Cap Attach 설비가 정지하였습니다.");
-	else 				  g_objCommon.Show_MsgBox(1, "Lot의 마지막 트레이 작업 중입니다.\n배출 준비 해주십시오.");
+
+	CString strMsg;
+
+	if		(wParam == 1) strMsg = "NG Tray Full 상태입니다.\nNG Tray 교체 해주십시오."; 
+	else if	(wParam == 2) strMsg ="현재 Lot이 종료 되었습니다. NG Tray 교체 해주십시오.";
+	else if	(wParam == 3) strMsg ="Cap Attach 설비가 정지하였습니다.";
+	else if	(wParam == 4) strMsg = "Empty Port Full 상태 입니다. 조치 후 다시 시작 해주십시오";
+	else strMsg = "Lot의 마지막 트레이 작업 중입니다.\n배출 준비 해주십시오.";
+
+	g_objCommon.Show_MsgBox(1, strMsg);
+	g_objLogFile.Save_HandlerLog("[Notice] "+strMsg);
+
 
 	return 0;
 }
@@ -1636,9 +1644,9 @@ void CWorkDlg::OnBnClickedButton4()
 
 void CWorkDlg::OnBnClickedButton5()
 {
-	//gData.bNGTrayWait = FALSE;
-	//gData.bGoodTrayWait = FALSE;
-	g_objLogFile.Save_ErrorNum("2000");
+	gData.bNGTrayWait = FALSE;
+	gData.bGoodTrayWait = FALSE;
+	//g_objLogFile.Save_ErrorNum("2000");
 	
 	
 }
